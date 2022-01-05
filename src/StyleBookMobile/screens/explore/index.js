@@ -13,7 +13,7 @@ import ExploreHeader from "../../components/header-explore"
 
 //Icons
 import PlusIcon from "../../assets/icons/plus.svg"
-import { useNavigation } from "@react-navigation/core"
+import { useNavigation } from "@react-navigation/native"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Feed from "../../components/feed"

@@ -9,7 +9,7 @@ import {
   Text,
 } from "react-native"
 import * as ImagePicker from "expo-image-picker"
-import { useRoute } from "@react-navigation/core"
+import { useRoute } from "@react-navigation/native"
 
 import TouchableRatingStars from "../../components/touchable-rating-stars"
 //Icons
@@ -17,7 +17,7 @@ import CameraIcon from "../../assets/icons/camera.svg"
 import GalleryIcon from "../../assets/icons/image-square-fill-dark.svg"
 import RemoveImageIcon from "../../assets/icons/file-x.svg"
 
-import { useNavigation } from "@react-navigation/core"
+import { useNavigation } from "@react-navigation/native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { useSelector, useDispatch } from "react-redux"

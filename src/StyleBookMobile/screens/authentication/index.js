@@ -209,10 +209,6 @@ const styles = StyleSheet.create({
     width: "60%",
     resizeMode: "contain",
   },
-  facebookLoginButton: {
-    marginVertical: 10,
-    width: "80%",
-  },
   divider: {
     width: "40%",
     marginTop: 10,

@@ -43,7 +43,7 @@ const ModalPost = (props) => {
   const SharePost = async () => {
     const hashed = await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
-      visible.img[0]
+      visible.img
     )
     const directory = `${FileSystem.cacheDirectory}${hashed}`
     await Sharing.shareAsync(directory)
@@ -103,11 +103,11 @@ const ModalPost = (props) => {
             </TouchableOpacity>
           </View>
           {visible && visible.img && visible.img.length > 0 && (
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
               <FastImage
                 style={styles.image}
                 resizeMode="cover"
-                source={{ uri: visible.img[0] }}
+                source={{ uri: visible.img }}
               />
               <View style={styles.feedText}>
                 <AuthorInfo

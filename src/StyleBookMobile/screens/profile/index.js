@@ -21,9 +21,6 @@ import {
 import Feed from "../../components/feed"
 import Avatar from "../../components/avatar"
 import Header from "../../components/header"
-// secure store
-import { deleteItemAsync } from "expo-secure-store"
-import { uploadAvatarAsync } from "../../utils/server"
 
 const { width, height } = Dimensions.get("window")
 const AVATAR_PERCENTAGE = 0.3
@@ -41,20 +38,7 @@ const Profile = () => {
   const userInfo = useSelector((state) => state.user)
 
   const user = otherUser ? otherUser : userInfo
-  const UPLOAD_PICTURE = "Upload picture"
-  useEffect(() => {
-    if (!route.params?.result) return
 
-    switch (route.params?.actionType) {
-      case UPLOAD_PICTURE:
-        uploadPicture(route.params.result)
-        route.params.result = undefined
-        route.params.actionType = undefined
-        break
-      default:
-        break
-    }
-  }, [route.params?.result])
   const logOut = () => {
     dispatch(setAccountInformation({}))
     navigation.dispatch(
