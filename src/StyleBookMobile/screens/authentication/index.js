@@ -116,7 +116,7 @@ export default function Authentication(props) {
         return (
           <>
             <Image
-              source={require("../../assets/logo-icons/logo.png")}
+              source={require("../../assets/logo-icons/app-icon-android.png")}
               style={styles.logoContainer}
             />
             <>
