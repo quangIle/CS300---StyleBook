@@ -118,12 +118,8 @@ const useEditProfileViewModel = () => {
     updateUserInformationAsync(userInputsText, (response, type) => {
       dispatch(setModalLoadingVisible(false))
       if (type === "success") {
-        if (response.status === 1) {
-          dispatch(
-            setAccountInformation({
-              user: { ...response.data },
-            })
-          )
+        if (response.status === 0) {
+          dispatch(setAccountInformation(response.data))
           dispatch(displayModalMessage(response.message))
         } else dispatch(displayModalMessage(response.message))
       } else dispatch(displayModalMessage(response.message))

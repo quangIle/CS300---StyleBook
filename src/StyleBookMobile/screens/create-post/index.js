@@ -32,7 +32,6 @@ const CreatePost = (props) => {
   const UPLOAD_PICTURE = "UPLOAD_PICTURE"
 
   const navigation = useNavigation()
-  const accountInfo = useSelector((state) => state.auth.accountInformation)
   const route = useRoute()
   const dispatch = useDispatch()
 
@@ -40,8 +39,6 @@ const CreatePost = (props) => {
   const [uploadImage, setUploadImage] = useState("")
   const [postContent, setPostContent] = useState("")
   const rating = useRef(0)
-
-  if (!accountInfo) return null
 
   const choosePicture = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -180,7 +177,7 @@ const CreatePost = (props) => {
         {item && (
           <View style={styles.rating}>
             <FastImage
-              source={{ uri: item.img[0] }}
+              source={{ uri: item.img }}
               style={{
                 aspectRatio: 0.8,
                 height: "100%",

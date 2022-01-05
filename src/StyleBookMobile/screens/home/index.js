@@ -25,77 +25,35 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 //Redux
 import { useDispatch, useSelector } from "react-redux"
 import {
-  addToSwipe,
-  addToSwipedList,
   addToWishlist,
-  setWishlist,
   setItemDetail,
-  setModalLoadingVisible,
-  clearSwipedList,
-  clearRemovedItemsInWishlist,
   displayModalMessage,
 } from "../../redux/actions"
 // server
-import {
-  fetchItemsAsync,
-  fetchItemDetailAsync,
-  fetchWishlistAsync,
-} from "../../utils/server"
-// navigation
-import {
-  useNavigation,
-  useRoute,
-  useFocusEffect,
-} from "@react-navigation/native"
+import { fetchItemDetailAsync, getItemsAsync } from "../../utils/server"
 
 const { width, height } = Dimensions.get("window")
 
 const HomeScreen = () => {
-  // const account = useSelector((state) => state.auth.accountInformation)
-  // const items = useSelector((state) => state.swipe)
-  // temporary not get items from redux
-
   const dispatch = useDispatch()
-  const navigation = useNavigation()
-  const route = useRoute()
 
-  const cursor = useRef("")
-  const items = useRef([])
+  const [items, setItems] = useState([])
 
-  const [render, setRender] = useState(false)
-  // TODO: optimize fetch item to reduce server call
-  const getMoreItems = (callback) => {
-    fetchItemsAsync(cursor.current, (response, type) => {
+  const getMoreItems = () => {
+    getItemsAsync((response, type) => {
       if (type === "success") {
-        if (response.status === 1) {
-          if (callback) callback()
-
-          dispatch(clearSwipedList())
-          dispatch(clearRemovedItemsInWishlist())
-
-          const newItems = response.data.itemFeed
-          cursor.current = response.data.cursor
-
-          newItems.map((item) => loadImage(item.img[0], null))
-          // dispatch(addToSwipe(newItems))
-          items.current.push(...newItems)
-
-          const idSet = new Set()
-          // check if prevState is null
-          items.current = items.current.filter(
-            ({ _id }) => !idSet.has(_id) && idSet.add(_id)
-          )
+        if (response.status === 0) {
+          const newItems = response.data
+          newItems.map((item) => loadImage(item.img, null))
 
           for (const card of cards.current) {
             //Rearrange the image after update
             const layerValue = Math.abs(card.layer.value)
             card.item =
-              items.current.length <= layerValue
-                ? null
-                : items.current[layerValue]
+              newItems.length <= layerValue ? null : newItems[layerValue]
           }
 
-          setRender((prevState) => !prevState)
+          setItems(newItems)
         } else dispatch(displayModalMessage(response.message))
       } else {
         dispatch(displayModalMessage(response.message))
@@ -107,17 +65,9 @@ const HomeScreen = () => {
     dispatch(setItemDetail({ isWaiting: true }))
     fetchItemDetailAsync(item, (response, type) => {
       if (type === "success") {
-        if (response.status === 1) {
+        if (response.status === 0) {
           dispatch(setItemDetail({ ...response.data, ...item }))
         } else dispatch(displayModalMessage(response.message))
-      } else dispatch(displayModalMessage(response.message))
-    })
-  }
-  const onFetchWishlist = () => {
-    fetchWishlistAsync((response, type) => {
-      if (type === "success") {
-        if (response.status === 1) dispatch(setWishlist(response.data))
-        else dispatch(displayModalMessage(response.message))
       } else dispatch(displayModalMessage(response.message))
     })
   }
@@ -150,62 +100,24 @@ const HomeScreen = () => {
   ])
   const onSwipe = async (isLike, item) => {
     const swipedItem = item
-    items.current = items.current.filter(({ _id }) => _id !== swipedItem._id)
+    const newItems = items.filter(({ _id }) => _id !== swipedItem._id)
     //The first card go in the back, then move the rest up to one
     for (const card of cards.current) {
       if (card.item?._id === swipedItem._id)
-        card.item = items.current[cards.current.length - 1]
-          ? items.current[cards.current.length - 1]
+        card.item = newItems[cards.current.length - 1]
+          ? newItems[cards.current.length - 1]
           : null
       card.layer.value++
     }
-    if (isLike) {
-      dispatch(addToSwipedList(swipedItem._id))
-      dispatch(addToWishlist(swipedItem))
-    }
-    if (!items.current[cards.current.length]) getMoreItems()
-
-    setRender(!render)
+    if (isLike) dispatch(addToWishlist(swipedItem))
+    setItems(newItems)
   }
-  // QR code
   useEffect(() => {
-    if (route.params?.qrData) {
-      onFetchItemDetail({ _id: route.params?.qrData })
-      route.params.qrData = null
-    }
-  })
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => (items.current.length < 20 ? getMoreItems() : null)
-    }, [])
-  )
-  useEffect(() => {
-    //get feed item then wishlist item -> serialize
-    getMoreItems(onFetchWishlist)
+    getMoreItems()
   }, [])
-  useEffect(() => {
-    const tabPress = navigation.addListener("tabPress", () =>
-      items.current.length < 20 ? getMoreItems() : null
-    )
-    return tabPress
-  }, [navigation])
-  // !!!!temporary comment for future exit app feature
-  // const backAction = () => {
-  //   Alert.alert("Hold on!", "Are you sure you want to go back?", [
-  //     {
-  //       text: "Cancel",
-  //       onPress: () => null,
-  //       style: "cancel",
-  //     },
-  //     { text: "YES", onPress: () => BackHandler.exitApp() },
-  //   ])
-  //   return true
-  // }
   // swipe up animation
   const onSwipeUp = (resetCardPosition) => {
-    onFetchItemDetail(items.current[0])
-    //TODO: handle this properly
+    onFetchItemDetail(items[0])
     setTimeout(
       () => {
         resetCardPosition()

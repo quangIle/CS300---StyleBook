@@ -6,9 +6,7 @@ import {
 } from "@react-navigation/stack"
 
 import Main from "../main"
-import IntroductionScreen from "../introduction"
 import CameraCapture from "../camera"
-import BarcodeScanner from "../barcode-scanner"
 
 import Authentication from "../authentication"
 import CreatePost from "../create-post"
@@ -17,19 +15,29 @@ import EditProfile from "../edit-profile"
 import ChangePassword from "../change-password"
 import ModalNotification from "../../components/modal-notification"
 
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
+import { setAccountInformation } from "../../redux/actions"
+import { signInAsync } from "../../utils/server"
 
 const Stack = createStackNavigator()
 
 const NavigationScreen = () => {
+  const dispatch = useDispatch()
   const [isUserValid, setIsUserValid] = useState(null)
   const user = useSelector((state) => state.user)
-  const checkUser = () => {
-    if (user.username === "User" && user.password === "123")
-      setIsUserValid(true)
+
+  const quickSignIn = () => {
+    signInAsync(user, (response, type) => {
+      if (type === "success") {
+        if (response.status === 0) {
+          dispatch(setAccountInformation(response.data))
+          setIsUserValid(true)
+        } else setIsUserValid(false)
+      } else setIsUserValid(false)
+    })
   }
   useEffect(() => {
-    checkUser()
+    quickSignIn()
   }, [])
   return (
     <>
@@ -41,7 +49,6 @@ const NavigationScreen = () => {
               headerShown: false,
             }}>
             <Stack.Screen name="Authentication" component={Authentication} />
-            <Stack.Screen name="Introduction" component={IntroductionScreen} />
             <Stack.Screen name="Main" component={Main} />
             <Stack.Screen
               name="Profile"
@@ -54,7 +61,6 @@ const NavigationScreen = () => {
             />
             <Stack.Screen name="Camera" component={CameraCapture} />
             <Stack.Screen name="Create post" component={CreatePost} />
-            <Stack.Screen name="Barcode scan" component={BarcodeScanner} />
             <Stack.Screen
               name="Edit profile"
               component={EditProfile}

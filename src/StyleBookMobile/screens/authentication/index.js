@@ -9,7 +9,11 @@ import {
 } from "react-native"
 import Form from "../../components/form"
 import { useDispatch, useSelector } from "react-redux"
-import { setAccountInformation } from "../../redux/actions"
+import {
+  setAccountInformation,
+  setModalLoadingVisible,
+  displayModalMessage,
+} from "../../redux/actions"
 //Icon
 import UsernameIcon from "../../assets/icons/user-avatar.svg"
 import PasswordIcon from "../../assets/icons/fingerprint-simple-thin.svg"
@@ -18,14 +22,14 @@ import FullnameIcon from "../../assets/icons/identification-card-thin.svg"
 
 import { useNavigation } from "@react-navigation/native"
 
+import { signInAsync, signupAsync } from "../../utils/server"
+
 export default function Authentication(props) {
   const navigation = useNavigation()
   const dispatch = useDispatch()
-  const GoToHomeScreen = () => {
-    navigation.replace("Main")
-  }
   const [authState, setAuthState] = useState(0)
   const user = useSelector((state) => state.user)
+
   const loginForm = useRef([
     {
       key: 5,
@@ -41,13 +45,43 @@ export default function Authentication(props) {
       value: "",
     },
   ])
-  const onUserLogin = () => {
+  const signup = () => {
+    const [
+      { value: email, avatarUrl },
+      { value: name },
+      { value: username },
+      { value: password },
+    ] = registerForm.current
+
+    dispatch(setModalLoadingVisible(true))
+    signupAsync({ email, name, username, password }, (response, type) => {
+      dispatch(setModalLoadingVisible(false))
+      if (type === "success") {
+        if (response.status === 0) {
+          dispatch(
+            displayModalMessage(
+              "Signed up successfully. Please sign in to start!"
+            )
+          )
+          setAuthState(0)
+        } else dispatch(displayModalMessage(response.message))
+      } else dispatch(displayModalMessage(response.message))
+    })
+  }
+  const signin = () => {
     // pull loginForm.current's "value" to username & password
     const [{ value: username }, { value: password }] = loginForm.current
-    if (username === "User" && password === "123") {
-      dispatch(setAccountInformation({ username, password }))
-      GoToHomeScreen()
-    }
+
+    dispatch(setModalLoadingVisible(true))
+    signInAsync({ username, password }, (response, type) => {
+      dispatch(setModalLoadingVisible(false))
+      if (type === "success") {
+        if (response.status === 0) {
+          dispatch(setAccountInformation(response.data))
+          navigation.replace("Main")
+        } else dispatch(displayModalMessage(response.message))
+      } else dispatch(displayModalMessage(response.message))
+    })
   }
   const registerForm = useRef([
     {
@@ -89,7 +123,7 @@ export default function Authentication(props) {
               <Form
                 form={loginForm.current}
                 buttonText={"Login"}
-                onCommit={onUserLogin}
+                onCommit={signin}
               />
               <View>
                 <Text
@@ -122,7 +156,7 @@ export default function Authentication(props) {
             <Form
               form={registerForm.current}
               buttonText={"Register"}
-              onCommit={() => {}}
+              onCommit={signup}
             />
             <View>
               <Text

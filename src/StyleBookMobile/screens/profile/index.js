@@ -56,6 +56,7 @@ const Profile = () => {
     }
   }, [route.params?.result])
   const logOut = () => {
+    dispatch(setAccountInformation({}))
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
@@ -128,7 +129,7 @@ const Profile = () => {
               </View>
             }
             style={styles.feed}
-            user={user._id}
+            username={user.username}
           />
         </View>
       </View>

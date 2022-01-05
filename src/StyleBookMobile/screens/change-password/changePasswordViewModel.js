@@ -1,14 +1,16 @@
 import { useNavigation } from "@react-navigation/native"
 import React, { useState, useRef } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import {
   setModalLoadingVisible,
   displayModalMessage,
+  setAccountInformation,
 } from "../../redux/actions"
-import { changePasswordAsync } from "../../utils/server"
+import { updateUserInformationAsync } from "../../utils/server"
 
 const useChangePasswordViewModel = () => {
   const navigation = useNavigation()
+  const user = useSelector((state) => state.user)
   const dispatch = useDispatch()
 
   const [userInputsText, setUserInputsText] = useState({
@@ -65,29 +67,33 @@ const useChangePasswordViewModel = () => {
           "The password and confirmation password do not match!"
         )
       )
-    else return false
+    else if (oldPass.text === user.password) {
+      user.password = newPass.text
+      return false
+    } else
+      dispatch(
+        displayModalMessage("Old password does not match current password.")
+      )
     return true
   }
   const onConfirmPress = () => {
     if (checkPassword()) return
+
     dispatch(setModalLoadingVisible(true))
-    changePasswordAsync(
-      userInputsText.oldPass.text,
-      userInputsText.newPass.text,
-      (response, type) => {
-        dispatch(setModalLoadingVisible(false))
-        if (type === "success") {
-          if (response.status === 1) {
-            userInputsText.oldPass.text = ""
-            userInputsText.newPass.text = ""
-            userInputsText.renewPass.text = ""
-            dispatch(
-              displayModalMessage(response.message, () => navigation.goBack())
-            )
-          } else dispatch(displayModalMessage(response.message))
+    updateUserInformationAsync(user, (response, type) => {
+      dispatch(setModalLoadingVisible(false))
+      if (type === "success") {
+        if (response.status === 0) {
+          dispatch(setAccountInformation(response.data))
+          userInputsText.oldPass.text = ""
+          userInputsText.newPass.text = ""
+          userInputsText.renewPass.text = ""
+          dispatch(
+            displayModalMessage(response.message, () => navigation.goBack())
+          )
         } else dispatch(displayModalMessage(response.message))
-      }
-    )
+      } else dispatch(displayModalMessage(response.message))
+    })
   }
   return {
     onBackPress,
