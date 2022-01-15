@@ -22,13 +22,13 @@ module.exports = {
       return res.json(
         response || {
           status: 0,
-          message: "Sign up success",
+          message: "Sign up successfully.",
         }
       )
     } catch (error) {
       return res.json({
         status: 1,
-        message: "Error occurred . Please try again",
+        message: "An error has occurred. Please try again!",
       })
     }
   },
@@ -42,14 +42,14 @@ module.exports = {
           if (user.password === password) {
             response = {
               status: 0,
-              message: "Sign in success",
+              message: "Sign in successfully.",
               data: user,
             }
             return
           } else {
             response = {
               status: 1,
-              message: "Wrong password",
+              message: "Wrong password.",
               data: user,
             }
             return
@@ -66,7 +66,7 @@ module.exports = {
     } catch (error) {
       return res.json({
         status: 1,
-        message: "Error occurred . Please try again",
+        message: "An error has occurred . Please try again!",
       })
     }
   },
