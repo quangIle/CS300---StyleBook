@@ -23,8 +23,8 @@ import TimerOn from "../../assets/icons/timer-on.svg"
 import TimerOff from "../../assets/icons/timer-off.svg"
 
 export default function CameraCapture() {
-  const FIRST_TIMER = 15
-  const SECOND_TIMER = 5
+  const timer1 = 15
+  const timer2 = 5
 
   const isFocused = useIsFocused()
   const route = useRoute()
@@ -35,7 +35,7 @@ export default function CameraCapture() {
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back)
   const [captures, setCaptures] = useState(null)
   // --Begin timer handle
-  const activeTimer = useRef(FIRST_TIMER)
+  const activeTimer = useRef(timer1)
   let COUNT_DOWN = activeTimer.current + 1
   const setActiveTimer = (value) => {
     activeTimer.current = value
@@ -152,18 +152,18 @@ export default function CameraCapture() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.timerTextContainer}
-                  onPress={() => setActiveTimer(FIRST_TIMER)}>
+                  onPress={() => setActiveTimer(timer1)}>
                   {isTimerOn && (
                     <Text
-                      style={getStyle(FIRST_TIMER)}>{`${FIRST_TIMER}s`}</Text>
+                      style={getStyle(timer1)}>{`${timer1}s`}</Text>
                   )}
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.timerTextContainer}
-                  onPress={() => setActiveTimer(SECOND_TIMER)}>
+                  onPress={() => setActiveTimer(timer2)}>
                   {isTimerOn && (
                     <Text
-                      style={getStyle(SECOND_TIMER)}>{`${SECOND_TIMER}s`}</Text>
+                      style={getStyle(timer2)}>{`${timer2}s`}</Text>
                   )}
                 </TouchableOpacity>
               </View>
