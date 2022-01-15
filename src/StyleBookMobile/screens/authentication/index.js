@@ -60,7 +60,7 @@ export default function Authentication(props) {
         if (response.status === 0) {
           dispatch(
             displayModalMessage(
-              "Signed up successfully. Please sign in to start!"
+              "Sign up successfully. Please sign in to start!"
             )
           )
           setAuthState(0)
