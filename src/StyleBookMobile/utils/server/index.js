@@ -12,7 +12,7 @@ const TEN_SECONDS = 10000
 const SUCCESS = "success"
 const FAIL = "fail"
 
-export const ENDPOINT = `http://${"192.168.0.14"}:8000`
+export const ENDPOINT = `http://${"192.168.0.10"}:8000`
 
 const errorHandler = (error) => {
   if (DEBUG) console.log(error)
@@ -125,7 +125,6 @@ export const updateUserInformationAsync = async (info, onResponse) => {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
-        authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(info),
